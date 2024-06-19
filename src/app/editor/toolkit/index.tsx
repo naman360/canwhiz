@@ -20,7 +20,7 @@ const Toolkit = () => {
           side="left"
           className="flex items-center w-16 z-[80] border-none shadow-none p-0 focus:border-none transition-all overflow-hidden"
         >
-          <div className="border py-4 py-2">
+          <div className="border border-l-0 py-4 py-2">
             <TabList />
           </div>
         </SheetContent>
