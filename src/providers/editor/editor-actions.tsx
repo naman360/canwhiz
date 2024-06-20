@@ -1,7 +1,7 @@
 export type EditorActions =
   | {
       type: "ADD_IMAGE";
-      payload: {};
+      payload: { image: string };
     }
   | {
       type: "SET_CONTEXT";

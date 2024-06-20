@@ -1,4 +1,5 @@
 "use client";
+import { v4 as uuidv4 } from "uuid";
 import { EditorBtns } from "@/lib/constants";
 import { createContext, Dispatch, useContext, useReducer } from "react";
 import { EditorActions } from "./editor-actions";
@@ -6,7 +7,9 @@ import { EditorActions } from "./editor-actions";
 export type EditorElement = {
   id: string;
   type: EditorBtns;
-  content: {};
+  content: {
+    url?: string;
+  };
 };
 export type Editor = {
   canvasCtx: CanvasRenderingContext2D | null;
@@ -42,7 +45,7 @@ const initialState: EditorState = {
 const EditorReducer = (
   state: EditorState = initialState,
   action: EditorActions
-) => {
+): EditorState => {
   switch (action.type) {
     case "SET_CONTEXT":
       return {
@@ -53,7 +56,20 @@ const EditorReducer = (
         },
       };
     case "ADD_IMAGE":
-      console.log("Added Image on Editor");
+      const newImageElement: EditorElement = {
+        id: uuidv4(),
+        type: "image",
+        content: { url: action.payload.image },
+      };
+
+      return {
+        ...state,
+        editor: {
+          ...state.editor,
+          elements: [...state.editor.elements, newImageElement],
+        },
+      };
+    default:
       return state;
   }
 };
