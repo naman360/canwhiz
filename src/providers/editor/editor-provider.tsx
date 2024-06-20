@@ -9,6 +9,7 @@ export type EditorElement = {
   content: {};
 };
 export type Editor = {
+  canvasCtx: CanvasRenderingContext2D | null;
   elements: EditorElement[];
   selectedElement: EditorElement;
 };
@@ -18,11 +19,12 @@ export type HistoryState = {
 };
 
 export type EditorState = {
-  Editor: Editor;
+  editor: Editor;
   history: HistoryState;
 };
 
 const inititalEditorState: Editor = {
+  canvasCtx: null,
   elements: [],
   selectedElement: { id: "", type: null, content: {} },
 };
@@ -33,7 +35,7 @@ const intitialHistoryState: HistoryState = {
 };
 
 const initialState: EditorState = {
-  Editor: inititalEditorState,
+  editor: inititalEditorState,
   history: intitialHistoryState,
 };
 
@@ -42,6 +44,14 @@ const EditorReducer = (
   action: EditorActions
 ) => {
   switch (action.type) {
+    case "SET_CONTEXT":
+      return {
+        ...state,
+        editor: {
+          ...state.editor,
+          canvasCtx: action.payload.context,
+        },
+      };
     case "ADD_IMAGE":
       console.log("Added Image on Editor");
       return state;
