@@ -1,3 +1,4 @@
+import { EditorProvider } from "@/providers/editor/editor-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import React, { ReactNode } from "react";
 
@@ -11,7 +12,7 @@ const Layout = ({ children }: Props) => {
       enableSystem
       disableTransitionOnChange
     >
-      {children}
+      <EditorProvider>{children}</EditorProvider>
     </ThemeProvider>
   );
 };
