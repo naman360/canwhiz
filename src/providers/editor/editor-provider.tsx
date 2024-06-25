@@ -7,6 +7,10 @@ import { EditorActions } from "./editor-actions";
 export type EditorElement = {
   id: string;
   type: EditorBtns;
+  startX: number;
+  startY: number;
+  width: number;
+  height: number;
   content: {
     url?: string;
   };
@@ -29,7 +33,15 @@ export type EditorState = {
 const inititalEditorState: Editor = {
   canvasCtx: null,
   elements: [],
-  selectedElement: { id: "", type: null, content: {} },
+  selectedElement: {
+    id: "",
+    type: null,
+    startX: 0,
+    startY: 0,
+    width: 0,
+    height: 0,
+    content: {},
+  },
 };
 
 const intitialHistoryState: HistoryState = {
@@ -59,6 +71,10 @@ const EditorReducer = (
       const newImageElement: EditorElement = {
         id: uuidv4(),
         type: "image",
+        startX: action.payload.startX,
+        startY: action.payload.startY,
+        width: action.payload.width,
+        height: action.payload.height,
         content: { url: action.payload.image },
       };
 
