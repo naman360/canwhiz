@@ -110,7 +110,17 @@ const Canvas = (props: Props) => {
     let currentShape = state.editor.elements[currentShapeIndex.current];
     currentShape.startX += dx;
     currentShape.startY += dy;
-    console.log(mouseX, mouseY, dx, dy, currentShape);
+    mouseStartingPoints.current.x = mouseX;
+    mouseStartingPoints.current.y = mouseY;
+    console.log(
+      mouseX,
+      mouseY,
+      mouseStartingPoints.current.x,
+      mouseStartingPoints.current.y,
+      dx,
+      dy,
+      currentShape
+    );
     dispatch({
       type: "MODIFY_IMAGE",
       payload: {
