@@ -85,6 +85,11 @@ const EditorReducer = (
           elements: [...state.editor.elements, newImageElement],
         },
       };
+    case "MODIFY_IMAGE":
+      const indexToBeModified = action.payload.index;
+      const newEditorElements = state.editor.elements;
+      newEditorElements.splice(indexToBeModified, 1);
+      newEditorElements.splice(indexToBeModified, 0, action.payload.newImage);
     default:
       return state;
   }

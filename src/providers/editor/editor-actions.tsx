@@ -1,3 +1,5 @@
+import { EditorElement } from "./editor-provider";
+
 export type EditorActions =
   | {
       type: "ADD_IMAGE";
@@ -7,6 +9,13 @@ export type EditorActions =
         startY: number;
         width: number;
         height: number;
+      };
+    }
+  | {
+      type: "MODIFY_IMAGE";
+      payload: {
+        index: number;
+        newImage: EditorElement;
       };
     }
   | {

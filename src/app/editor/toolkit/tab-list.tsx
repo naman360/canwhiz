@@ -19,7 +19,13 @@ const TabList = () => {
         if (reader.result) {
           dispatch({
             type: "ADD_IMAGE",
-            payload: { image: reader.result as string },
+            payload: {
+              startX: 0,
+              startY: 0,
+              width: 400,
+              height: 400,
+              image: reader.result as string,
+            },
           });
         }
       };
