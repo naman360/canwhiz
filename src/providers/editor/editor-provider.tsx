@@ -90,6 +90,15 @@ const EditorReducer = (
       const newEditorElements = state.editor.elements;
       newEditorElements.splice(indexToBeModified, 1);
       newEditorElements.splice(indexToBeModified, 0, action.payload.newImage);
+      return {
+        ...state,
+        editor: { ...state.editor, elements: newEditorElements },
+      };
+    case "SET_SELECTED_ELEMENT":
+      return {
+        ...state,
+        editor: { ...state.editor, selectedElement: action.payload.element },
+      };
     default:
       return state;
   }

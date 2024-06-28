@@ -78,6 +78,7 @@ const Canvas = (props: Props) => {
     mouseStartingPoints.current.x = e.clientX - (window.innerWidth - 800); //800 is canvas width
     mouseStartingPoints.current.y = e.clientY;
     let index = 0;
+
     // Check if mouse click collides with image
     for (let element of state.editor.elements) {
       if (
@@ -94,6 +95,13 @@ const Canvas = (props: Props) => {
       }
       index++;
     }
+    // Select Clicked Element
+    dispatch({
+      type: "SET_SELECTED_ELEMENT",
+      payload: {
+        element: state.editor.elements[currentShapeIndex.current],
+      },
+    });
   };
 
   const handleMouseMove:

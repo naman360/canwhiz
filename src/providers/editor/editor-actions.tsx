@@ -19,6 +19,12 @@ export type EditorActions =
       };
     }
   | {
+      type: "SET_SELECTED_ELEMENT";
+      payload: {
+        element: EditorElement;
+      };
+    }
+  | {
       type: "SET_CONTEXT";
       payload: {
         context: CanvasRenderingContext2D | null;
