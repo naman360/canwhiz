@@ -49,6 +49,18 @@ const Canvas = (props: Props) => {
             );
           };
         }
+
+        if (element.id === state.editor.selectedElement) {
+          canvasCtx.setLineDash([5]);
+          canvasCtx.strokeStyle = "#000";
+          canvasCtx.lineWidth = 1;
+          canvasCtx.strokeRect(
+            element.startX,
+            element.startY,
+            element.width,
+            element.height
+          );
+        }
       });
     }
   };
@@ -88,20 +100,19 @@ const Canvas = (props: Props) => {
           element
         )
       ) {
-        console.log("In Image");
         currentShapeIndex.current = index;
         isDragging.current = true;
-        return;
+        // Select Clicked Element
+        dispatch({
+          type: "SET_SELECTED_ELEMENT",
+          payload: {
+            elementId: state.editor.elements[currentShapeIndex.current]?.id,
+          },
+        });
+        break;
       }
       index++;
     }
-    // Select Clicked Element
-    dispatch({
-      type: "SET_SELECTED_ELEMENT",
-      payload: {
-        element: state.editor.elements[currentShapeIndex.current],
-      },
-    });
   };
 
   const handleMouseMove:
@@ -120,15 +131,7 @@ const Canvas = (props: Props) => {
     currentShape.startY += dy;
     mouseStartingPoints.current.x = mouseX;
     mouseStartingPoints.current.y = mouseY;
-    console.log(
-      mouseX,
-      mouseY,
-      mouseStartingPoints.current.x,
-      mouseStartingPoints.current.y,
-      dx,
-      dy,
-      currentShape
-    );
+
     dispatch({
       type: "MODIFY_IMAGE",
       payload: {
@@ -136,7 +139,6 @@ const Canvas = (props: Props) => {
         newImage: currentShape,
       },
     });
-    // console.log(state.editor.elements);
     drawImages();
   };
 

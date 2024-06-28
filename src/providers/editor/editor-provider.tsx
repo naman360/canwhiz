@@ -18,7 +18,7 @@ export type EditorElement = {
 export type Editor = {
   canvasCtx: CanvasRenderingContext2D | null;
   elements: EditorElement[];
-  selectedElement: EditorElement;
+  selectedElement: string;
 };
 export type HistoryState = {
   history: Editor[];
@@ -33,15 +33,7 @@ export type EditorState = {
 const inititalEditorState: Editor = {
   canvasCtx: null,
   elements: [],
-  selectedElement: {
-    id: "",
-    type: null,
-    startX: 0,
-    startY: 0,
-    width: 0,
-    height: 0,
-    content: {},
-  },
+  selectedElement: "",
 };
 
 const intitialHistoryState: HistoryState = {
@@ -97,7 +89,7 @@ const EditorReducer = (
     case "SET_SELECTED_ELEMENT":
       return {
         ...state,
-        editor: { ...state.editor, selectedElement: action.payload.element },
+        editor: { ...state.editor, selectedElement: action.payload.elementId },
       };
     default:
       return state;

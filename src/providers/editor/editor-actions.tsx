@@ -4,6 +4,7 @@ export type EditorActions =
   | {
       type: "ADD_IMAGE";
       payload: {
+        id: string;
         image: string;
         startX: number;
         startY: number;
@@ -21,7 +22,7 @@ export type EditorActions =
   | {
       type: "SET_SELECTED_ELEMENT";
       payload: {
-        element: EditorElement;
+        elementId: string;
       };
     }
   | {

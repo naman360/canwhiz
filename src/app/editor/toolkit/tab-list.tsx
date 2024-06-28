@@ -1,4 +1,5 @@
 import React, { ChangeEvent } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ALargeSmallIcon,
@@ -20,6 +21,7 @@ const TabList = () => {
           dispatch({
             type: "ADD_IMAGE",
             payload: {
+              id: uuidv4(),
               startX: 0,
               startY: 0,
               width: 400,
