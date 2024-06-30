@@ -34,8 +34,13 @@ const Canvas = (props: Props) => {
         canvasCtx.canvas.width,
         canvasCtx.canvas.height
       );
+
+      // Draw non-selected elements first
       elements.forEach((element) => {
-        if (element.type === "image") {
+        if (
+          element.type === "image" &&
+          element.id !== state.editor.selectedElement
+        ) {
           if (!element.content.url) return;
           const img = new Image();
           img.src = element.content.url;
@@ -49,21 +54,43 @@ const Canvas = (props: Props) => {
             );
           };
         }
+      });
 
-        if (element.id === state.editor.selectedElement) {
+      // Draw selected element next to ensure it's on top of every image
+      const selectedElement = elements.find(
+        (element) => element.id === state.editor.selectedElement
+      );
+      if (
+        selectedElement &&
+        selectedElement.type === "image" &&
+        selectedElement.content.url
+      ) {
+        const img = new Image();
+        img.src = selectedElement.content.url;
+
+        img.onload = () => {
+          canvasCtx.drawImage(
+            img,
+            selectedElement.startX,
+            selectedElement.startY,
+            selectedElement.width,
+            selectedElement.height
+          );
+          // draw the selected region
           canvasCtx.setLineDash([5]);
           canvasCtx.strokeStyle = "#000";
           canvasCtx.lineWidth = 1;
           canvasCtx.strokeRect(
-            element.startX,
-            element.startY,
-            element.width,
-            element.height
+            selectedElement.startX,
+            selectedElement.startY,
+            selectedElement.width,
+            selectedElement.height
           );
-        }
-      });
+        };
+      }
     }
   };
+
   const doesMouseCollides = (
     mouseX: number,
     mouseY: number,
