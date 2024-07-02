@@ -25,6 +25,12 @@ const Canvas = (props: Props) => {
     drawImages();
   }, [state.editor.elements]);
 
+  /* TODO: Optimise drawing of image, avoid drawing all image instead only draw the image which is actually changed
+    1. Figure out Data Structure to optimally find which image is changed 
+    2. Figure out which image is changed.
+    3. Redraw the changed image.
+  */
+
   const drawImages = () => {
     const { elements, canvasCtx } = state.editor;
     if (canvasCtx) {
@@ -42,17 +48,7 @@ const Canvas = (props: Props) => {
           element.id !== state.editor.selectedElement
         ) {
           if (!element.content.url) return;
-          const img = new Image();
-          img.src = element.content.url;
-          img.onload = () => {
-            canvasCtx.drawImage(
-              img,
-              element.startX,
-              element.startY,
-              element.width,
-              element.height
-            );
-          };
+          drawImage(element);
         }
       });
 
@@ -65,32 +61,38 @@ const Canvas = (props: Props) => {
         selectedElement.type === "image" &&
         selectedElement.content.url
       ) {
-        const img = new Image();
-        img.src = selectedElement.content.url;
-
-        img.onload = () => {
-          canvasCtx.drawImage(
-            img,
-            selectedElement.startX,
-            selectedElement.startY,
-            selectedElement.width,
-            selectedElement.height
-          );
-          // draw the selected region
-          canvasCtx.setLineDash([5]);
-          canvasCtx.strokeStyle = "#000";
-          canvasCtx.lineWidth = 1;
-          canvasCtx.strokeRect(
-            selectedElement.startX,
-            selectedElement.startY,
-            selectedElement.width,
-            selectedElement.height
-          );
-        };
+        drawImage(selectedElement, true);
       }
     }
   };
-
+  const drawImage = (element: EditorElement, isSelected?: boolean) => {
+    const { canvasCtx } = state.editor;
+    if (!canvasCtx) return;
+    // Draw image on canvas
+    const img = new Image();
+    img.src = element.content.url!;
+    img.onload = () => {
+      canvasCtx.drawImage(
+        img,
+        element.startX,
+        element.startY,
+        element.width,
+        element.height
+      );
+      if (isSelected) {
+        // Draw the selected region
+        canvasCtx.setLineDash([5]);
+        canvasCtx.strokeStyle = "#000";
+        canvasCtx.lineWidth = 1;
+        canvasCtx.strokeRect(
+          element.startX,
+          element.startY,
+          element.width,
+          element.height
+        );
+      }
+    };
+  };
   const doesMouseCollides = (
     mouseX: number,
     mouseY: number,
