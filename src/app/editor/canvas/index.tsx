@@ -18,6 +18,7 @@ const Canvas = (props: Props) => {
           context: canvasRef.current.getContext("2d"),
         },
       });
+      fillCanvasBgColor(canvasRef.current.getContext("2d"));
     }
   }, []);
 
@@ -25,21 +26,39 @@ const Canvas = (props: Props) => {
     drawImages();
   }, [state.editor.elements]);
 
-  /* TODO: Optimise drawing of image, avoid drawing all image instead only draw the image which is actually changed
-    1. Figure out Data Structure to optimally find which image is changed 
+  /* 
+    TODO: Optimise drawing of image, avoid drawing all image instead only draw the image which is actually changed
+    1. Figure out Data Structure to optimally find whi  ch image is changed 
     2. Figure out which image is changed.
     3. Redraw the changed image.
   */
 
+  /*
+    Function to fill canvas with white color before drawing images, for enabling users to download the image with white background
+  */
+  const fillCanvasBgColor = (context?: CanvasRenderingContext2D | null) => {
+    const { canvasCtx } = state.editor;
+    const canvasContext = canvasCtx || context;
+    if (!canvasContext) return;
+    canvasContext.clearRect(
+      0,
+      0,
+      canvasContext.canvas.width,
+      canvasContext.canvas.height
+    );
+    canvasContext.fillStyle = "#ffffff";
+    canvasContext.fillRect(
+      0,
+      0,
+      canvasContext.canvas.width,
+      canvasContext.canvas.height
+    );
+  };
+
   const drawImages = () => {
     const { elements, canvasCtx } = state.editor;
     if (canvasCtx) {
-      canvasCtx.clearRect(
-        0,
-        0,
-        canvasCtx.canvas.width,
-        canvasCtx.canvas.height
-      );
+      fillCanvasBgColor();
 
       // Draw non-selected elements first
       elements.forEach((element) => {

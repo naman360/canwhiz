@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ALargeSmallIcon,
+  DownloadIcon,
   ImagesIcon,
   MousePointer2,
   SettingsIcon,
@@ -11,7 +12,7 @@ import {
 import { useEditor } from "@/providers/editor/editor-provider";
 
 const TabList = () => {
-  const { dispatch } = useEditor();
+  const { dispatch, state } = useEditor();
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -35,6 +36,26 @@ const TabList = () => {
     }
   };
 
+  const handleDownload = () => {
+    const { canvasCtx, elements, selectedElement } = state.editor;
+    if (!canvasCtx) return;
+    //TODO: Remove selection region from downloaded image
+
+    downloadImage();
+  };
+
+  const downloadImage = () => {
+    const { canvasCtx } = state.editor;
+    if (!canvasCtx) return;
+    const link = document.createElement("a");
+
+    //TODO: Provide options for other formats as well
+    link.href = canvasCtx.canvas.toDataURL("image/jpeg");
+    link.download = "image-1.jpeg";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   return (
     <TabsList className="flex items-center flex-col justify-evenly w-full bg-transparent h-fit gap-4">
       <TabsTrigger
@@ -68,6 +89,13 @@ const TabList = () => {
         className="w-10 h-10 p-0 data-[state=active]:bg-muted"
       >
         <ShareIcon />
+      </TabsTrigger>
+      <TabsTrigger
+        value="Download"
+        className="w-10 h-10 p-0 data-[state=active]:bg-muted"
+        onClick={handleDownload}
+      >
+        <DownloadIcon />
       </TabsTrigger>
     </TabsList>
   );
