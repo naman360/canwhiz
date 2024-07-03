@@ -100,15 +100,7 @@ const Canvas = (props: Props) => {
       );
       if (isSelected) {
         // Draw the selected region
-        canvasCtx.setLineDash([5]);
-        canvasCtx.strokeStyle = "#000";
-        canvasCtx.lineWidth = 1;
-        canvasCtx.strokeRect(
-          element.startX,
-          element.startY,
-          element.width,
-          element.height
-        );
+        createSelectionArea(element);
       }
     };
   };
@@ -131,11 +123,24 @@ const Canvas = (props: Props) => {
       return true;
     return false;
   };
+  const createSelectionArea = (element: EditorElement) => {
+    const { canvasCtx } = state.editor;
+    if (!canvasCtx) return;
+    canvasCtx.setLineDash([5]);
+    canvasCtx.strokeStyle = "#000";
+    canvasCtx.lineWidth = 1;
+    canvasCtx.strokeRect(
+      element.startX,
+      element.startY,
+      element.width,
+      element.height
+    );
+  };
   const handleMouseDown:
     | React.MouseEventHandler<HTMLCanvasElement>
     | undefined = (e) => {
     e.preventDefault();
-    mouseStartingPoints.current.x = e.clientX - (window.innerWidth - 800); //800 is canvas width
+    mouseStartingPoints.current.x = e.clientX - (window.innerWidth - 800); // * 800 is canvas width
     mouseStartingPoints.current.y = e.clientY;
     let index = 0;
 
@@ -157,6 +162,7 @@ const Canvas = (props: Props) => {
             elementId: state.editor.elements[currentShapeIndex.current]?.id,
           },
         });
+        createSelectionArea(state.editor.elements[currentShapeIndex.current]);
         break;
       }
       index++;
