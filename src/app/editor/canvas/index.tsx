@@ -23,8 +23,19 @@ const Canvas = (props: Props) => {
   }, []);
 
   useEffect(() => {
-    drawImages();
+    drawOnBgCanvas();
+    // draw everything on bg canvas
+    // draw selected image on foreground canvas with selection area.
+    // add mouse events on foreground canvas
+    // on mouse up event draw foreground canvas on bg canvas
   }, [state.editor.elements]);
+
+  const drawOnBgCanvas = () => {
+    let bgCanvas = document.getElementById("bg-canvas") as HTMLCanvasElement;
+    const bgCanvasContext = bgCanvas.getContext("2d");
+
+    drawImages(bgCanvasContext);
+  };
 
   /* 
     TODO: Optimise drawing of image, avoid drawing all image instead only draw the image which is actually changed
@@ -38,7 +49,7 @@ const Canvas = (props: Props) => {
   */
   const fillCanvasBgColor = (context?: CanvasRenderingContext2D | null) => {
     const { canvasCtx } = state.editor;
-    const canvasContext = canvasCtx || context;
+    const canvasContext = context || canvasCtx;
     if (!canvasContext) return;
     canvasContext.clearRect(
       0,
@@ -55,43 +66,48 @@ const Canvas = (props: Props) => {
     );
   };
 
-  const drawImages = () => {
-    const { elements, canvasCtx } = state.editor;
-    if (canvasCtx) {
-      fillCanvasBgColor();
+  const drawImages = (context: CanvasRenderingContext2D | null) => {
+    const { canvasCtx, elements } = state.editor;
+    const canvasContext = context || canvasCtx;
+    if (!canvasContext) return;
 
-      // Draw non-selected elements first
-      elements.forEach((element) => {
-        if (
-          element.type === "image" &&
-          element.id !== state.editor.selectedElement
-        ) {
-          if (!element.content.url) return;
-          drawImage(element);
-        }
-      });
+    fillCanvasBgColor(canvasCtx);
 
-      // Draw selected element next to ensure it's on top of every image
-      const selectedElement = elements.find(
-        (element) => element.id === state.editor.selectedElement
-      );
+    // Draw non-selected elements first
+    elements.forEach((element) => {
       if (
-        selectedElement &&
-        selectedElement.type === "image" &&
-        selectedElement.content.url
+        element.type === "image" &&
+        element.id !== state.editor.selectedElement
       ) {
-        drawImage(selectedElement, true);
+        if (!element.content.url) return;
+        drawImage(canvasContext, element);
       }
+    });
+
+    // Draw selected element next to ensure it's on top of every image
+    const selectedElement = elements.find(
+      (element) => element.id === state.editor.selectedElement
+    );
+    if (
+      selectedElement &&
+      selectedElement.type === "image" &&
+      selectedElement.content.url
+    ) {
+      drawImage(canvasContext, selectedElement, true);
     }
   };
-  const drawImage = (element: EditorElement, isSelected?: boolean) => {
-    const { canvasCtx } = state.editor;
-    if (!canvasCtx) return;
+
+  const drawImage = (
+    context: CanvasRenderingContext2D | null,
+    element: EditorElement,
+    isSelected?: boolean
+  ) => {
+    if (!context) return;
     // Draw image on canvas
     const img = new Image();
     img.src = element.content.url!;
     img.onload = () => {
-      canvasCtx.drawImage(
+      context.drawImage(
         img,
         element.startX,
         element.startY,
@@ -100,7 +116,7 @@ const Canvas = (props: Props) => {
       );
       if (isSelected) {
         // Draw the selected region
-        createSelectionArea(element);
+        createSelectionArea(context, element);
       }
     };
   };
@@ -123,13 +139,15 @@ const Canvas = (props: Props) => {
       return true;
     return false;
   };
-  const createSelectionArea = (element: EditorElement) => {
-    const { canvasCtx } = state.editor;
-    if (!canvasCtx) return;
-    canvasCtx.setLineDash([5]);
-    canvasCtx.strokeStyle = "#000";
-    canvasCtx.lineWidth = 1;
-    canvasCtx.strokeRect(
+  const createSelectionArea = (
+    context: CanvasRenderingContext2D | null,
+    element: EditorElement
+  ) => {
+    if (!context) return;
+    context.setLineDash([5]);
+    context.strokeStyle = "#000";
+    context.lineWidth = 1;
+    context.strokeRect(
       element.startX,
       element.startY,
       element.width,
@@ -162,10 +180,34 @@ const Canvas = (props: Props) => {
             elementId: state.editor.elements[currentShapeIndex.current]?.id,
           },
         });
-        createSelectionArea(state.editor.elements[currentShapeIndex.current]);
+
+        // * Draw selected image on Fg Canvas
+        drawImageOnFgCanvas(
+          state.editor.elements[currentShapeIndex.current]?.id
+        );
+        // createSelectionArea(state.editor.elements[currentShapeIndex.current]);
         break;
       }
       index++;
+    }
+  };
+
+  const drawImageOnFgCanvas = (elementId?: string) => {
+    // Clear Foreground Canvas
+    const { canvasCtx, elements, selectedElement } = state.editor;
+    if (!canvasCtx) return;
+    canvasCtx.clearRect(0, 0, canvasCtx.canvas.width, canvasCtx.canvas.height);
+
+    // Draw selected image on canvas
+    const currentSelectedElement = elements.find(
+      (element) => element.id === elementId || selectedElement
+    );
+    if (
+      currentSelectedElement &&
+      currentSelectedElement.type === "image" &&
+      currentSelectedElement.content.url
+    ) {
+      drawImage(canvasCtx, currentSelectedElement, true);
     }
   };
 
@@ -193,7 +235,8 @@ const Canvas = (props: Props) => {
         newImage: currentShape,
       },
     });
-    drawImages();
+    //TODO: Keep drawing image on FG Canvas
+    drawImageOnFgCanvas();
   };
 
   const handleMouseUp:
@@ -205,16 +248,27 @@ const Canvas = (props: Props) => {
   };
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="border border-black"
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      id="primary-canvas"
-      width={800}
-      height={600}
-    />
+    <div className="flex flex-col relative">
+      <canvas
+        ref={canvasRef}
+        className="border border-black absolute"
+        // onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        id="primary-canvas"
+        width={800}
+        height={600}
+      />
+      <canvas
+        className="border border-black z-10"
+        onMouseDown={handleMouseDown}
+        // onMouseMove={handleMouseMove}
+        // onMouseUp={handleMouseUp}
+        id="bg-canvas"
+        width={800}
+        height={600}
+      />
+    </div>
   );
 };
 
