@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useRef } from "react";
 import { EditorElement, useEditor } from "@/providers/editor/editor-provider";
 
