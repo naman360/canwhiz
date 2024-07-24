@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import React from "react";
 import { v4 as uuidv4 } from "uuid";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -11,8 +11,16 @@ import {
 } from "lucide-react";
 import { useEditor } from "@/providers/editor/editor-provider";
 
-const TabList = () => {
+type Props = {
+  activeTool: string;
+  setActiveTool: React.Dispatch<React.SetStateAction<string>>;
+  handleToolFn: (tool: string) => void;
+};
+
+const TabList = (props: Props) => {
+  const { activeTool, setActiveTool, handleToolFn } = props;
   const { dispatch, state } = useEditor();
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -36,6 +44,11 @@ const TabList = () => {
     }
   };
 
+  const handleTextButton = () => {
+    setActiveTool("text");
+    handleToolFn("text");
+  };
+
   const handleDownload = () => {
     const { canvasCtx, elements, selectedElement } = state.editor;
     if (!canvasCtx) return;
@@ -56,6 +69,7 @@ const TabList = () => {
     link.click();
     document.body.removeChild(link);
   };
+
   return (
     <TabsList className="flex items-center flex-col justify-evenly w-full bg-transparent h-fit gap-4">
       <TabsTrigger
@@ -76,7 +90,7 @@ const TabList = () => {
         value="Text"
         className="data-[state=active]:bg-muted w-10 h-10 p-0"
       >
-        <ALargeSmallIcon />
+        <ALargeSmallIcon onClick={handleTextButton} />
       </TabsTrigger>
       <TabsTrigger
         value="Settings"

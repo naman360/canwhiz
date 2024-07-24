@@ -74,3 +74,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+.writing_area {
+  position: fixed;
+  font: 24px sans-serif;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  overflow: hidden;
+  white-space: pre;
+  background: transparent;
+  z-index: 2;
+}

@@ -13,6 +13,7 @@ export type EditorElement = {
   height: number;
   content: {
     url?: string;
+    text?: string;
   };
 };
 export type Editor = {

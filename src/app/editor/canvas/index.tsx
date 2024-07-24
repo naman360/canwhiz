@@ -1,14 +1,21 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { EditorElement, useEditor } from "@/providers/editor/editor-provider";
 
-const Canvas = () => {
+type Props = {
+  activeTool: string;
+};
+const Canvas = (props: Props) => {
+  const { activeTool } = props;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const bgCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDragging = useRef<boolean>(false);
   const mouseStartingPoints = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const currentShapeIndex = useRef<number>(-1);
   const { state, dispatch } = useEditor();
+  const [selectedElement, setSelectedElement] = useState<EditorElement | null>(
+    null
+  );
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -23,7 +30,6 @@ const Canvas = () => {
 
   useEffect(() => {
     drawOnBgCanvas();
-    // You can add more logic here if needed, like drawing selection areas
   }, [state.editor.elements]);
 
   const drawOnBgCanvas = () => {
@@ -37,7 +43,7 @@ const Canvas = () => {
     bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
 
     state.editor.elements.forEach((element) => {
-      if (element.type === "image") {
+      if (element.type === "image" && element.id !== selectedElement?.id) {
         drawImage(bgCtx, element);
       }
     });
@@ -71,6 +77,7 @@ const Canvas = () => {
         currentShapeIndex.current = index;
         isDragging.current = true;
         mouseStartingPoints.current = { x: mouseX, y: mouseY };
+        setSelectedElement(element);
 
         dispatch({
           type: "SET_SELECTED_ELEMENT",
@@ -126,15 +133,19 @@ const Canvas = () => {
       },
     });
 
-    // Clear foreground canvas and redraw the selected image
+    // Clear and redraw the selected image on the foreground canvas
     const canvasCtx = canvasRef.current.getContext("2d");
     if (!canvasCtx) return;
     canvasCtx.clearRect(0, 0, canvasCtx.canvas.width, canvasCtx.canvas.height);
-    drawImage(canvasCtx, currentShape);
+    drawImage(canvasCtx, currentShape); // Draw the updated image
+
+    // Clear and redraw the background canvas without the selected image
+    drawOnBgCanvas();
   };
 
   const handleMouseUp: React.MouseEventHandler<HTMLCanvasElement> = (e) => {
     isDragging.current = false;
+    setSelectedElement(null); // Reset selected element state
   };
 
   return (
@@ -148,7 +159,7 @@ const Canvas = () => {
       />
       <canvas
         ref={canvasRef}
-        className="border border-black z-10"
+        className="border border-black z-1"
         id="primary-canvas"
         width={800}
         height={600}
@@ -156,6 +167,16 @@ const Canvas = () => {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       />
+      {activeTool === "text" ? (
+        <textarea
+          className="writing_area"
+          style={{
+            top: 0,
+            left: 0,
+            font: `24 px sans-serif`,
+          }}
+        />
+      ) : null}
     </div>
   );
 };
