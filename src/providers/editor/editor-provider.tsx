@@ -9,8 +9,8 @@ export type EditorElement = {
   type: EditorBtns;
   startX: number;
   startY: number;
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
   content: {
     url?: string;
     text?: string;
@@ -58,6 +58,22 @@ const EditorReducer = (
         editor: {
           ...state.editor,
           canvasCtx: action.payload.context,
+        },
+      };
+    case "ADD_ELEMENT":
+      const newElement: EditorElement = {
+        id: uuidv4(),
+        type: action.payload.type,
+        startX: action.payload.startX,
+        startY: action.payload.startY,
+        content: { text: action.payload.text },
+      };
+
+      return {
+        ...state,
+        editor: {
+          ...state.editor,
+          elements: [...state.editor.elements, newElement],
         },
       };
     case "ADD_IMAGE":

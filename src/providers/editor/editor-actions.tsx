@@ -1,6 +1,16 @@
+import { EditorBtns } from "@/lib/constants";
 import { EditorElement } from "./editor-provider";
 
 export type EditorActions =
+  | {
+      type: "ADD_ELEMENT";
+      payload: {
+        type: EditorBtns;
+        text: string;
+        startX: number;
+        startY: number;
+      };
+    }
   | {
       type: "ADD_IMAGE";
       payload: {

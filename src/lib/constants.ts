@@ -1,1 +1,1 @@
-export type EditorBtns = "image" | null;
+export type EditorBtns = "image" | "text"| null;
