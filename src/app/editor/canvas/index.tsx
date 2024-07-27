@@ -98,6 +98,9 @@ const Canvas = (props: Props) => {
     startX: number;
     startY: number;
   }) => {
+    //TODO: Draggable text
+    //TODO: Include text in downloaded image
+    //TODO: Styles for text if it is selected element
     const canvasCtx = canvasRef.current?.getContext("2d");
     if (!canvasCtx) return;
     canvasCtx.font = "24px arial";
